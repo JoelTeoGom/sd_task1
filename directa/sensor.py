@@ -8,7 +8,7 @@ import time
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
-# 5 de cada 
+# 5 de cada sensor 
 N_SENS = 5
 
 # open a gRPC channel
@@ -47,7 +47,6 @@ with grpc.insecure_channel('localhost:50051') as channel:
 
             time.sleep(2)
     except KeyboardInterrupt:
-        print(meteo_data)
         channel.close()
 
 

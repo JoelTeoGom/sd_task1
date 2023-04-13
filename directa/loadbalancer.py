@@ -12,13 +12,17 @@ class MeteoServiceServicer(meteoServer_pb2_grpc.MeteoServiceServicer):
     def SendMeteoData(self,RawMeteoData, context):
         meteo_service.send_meteo_data(RawMeteoData)
         response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()
-    
+        for elemento in list(meteo_service.lb_queue.queue):
+            print(elemento)
+          
+        print("===============================================================")
+            
+        
         return response
             
     def SendPollutionData(self,RawPollutionData, context):
-        meteo_service.lb_queue.put(RawPollutionData)
+        meteo_service.send_pollution_data(RawPollutionData)
         response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()
-      
         return response
         
     
@@ -36,6 +40,6 @@ server.start()
 # a sleep-loop is added to keep alive
 try:
     while True:
-        time.sleep(86400)
+        server.wait_for_termination()
 except KeyboardInterrupt:
     server.stop(0)

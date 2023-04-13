@@ -7,13 +7,11 @@ class meteoService:
         self.lb_queue = Queue()
 
     def send_meteo_data(self,RawMeteoData):
-        print (RawMeteoData)
-        self.lb_queue.put(RawMeteoData.id)
+        self.lb_queue.put(RawMeteoData)
         return 'Done'
     
     def send_pollution_data(self,RawPollutionData):
         self.lb_queue.put(RawPollutionData)
         return 'Done'
-
 
 meteo_service = meteoService()
