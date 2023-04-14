@@ -1,10 +1,11 @@
 import random
 from queue import Queue
+import multiprocessing
 
 class meteoService:
 
     def __init__(self):
-        self.lb_queue = Queue()
+       self.lb_queue = multiprocessing.Queue()
 
     def send_meteo_data(self,RawMeteoData):
         self.lb_queue.put(RawMeteoData)

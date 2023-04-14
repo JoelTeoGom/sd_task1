@@ -11,15 +11,9 @@ from meteo_service import meteo_service
 class MeteoServiceServicer(meteoServer_pb2_grpc.MeteoServiceServicer):
     def SendMeteoData(self,RawMeteoData, context):
         meteo_service.send_meteo_data(RawMeteoData)
-        response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()
-        for elemento in list(meteo_service.lb_queue.queue):
-            print(elemento)
-          
-        print("===============================================================")
-            
-        
+        response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()        
         return response
-            
+
     def SendPollutionData(self,RawPollutionData, context):
         meteo_service.send_pollution_data(RawPollutionData)
         response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()
