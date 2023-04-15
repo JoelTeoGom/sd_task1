@@ -11,6 +11,7 @@ from processor_service import processor_service
 
 #clase del servicio LB que delega a la clase LB serice
 class LoadBalancerServiceServicer(meteoServer_pb2_grpc.LoadBalancerServiceServicer):
+    
     def SendMeteoData(self,RawMeteoData, context):
         load_balancer_service.send_meteo_data(RawMeteoData)
         response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()        
@@ -22,13 +23,14 @@ class LoadBalancerServiceServicer(meteoServer_pb2_grpc.LoadBalancerServiceServic
         return response
         
 class ProcessorServiceServicer(meteoServer_pb2_grpc.ProcessServiceServicer):
-    def SendMeteoData(self,RawMeteoData, context):
-        processor_service.send_meteo_data(RawMeteoData)
+    
+    def ProcessMeteoData(self,RawMeteoData, context):
+        processor_service.process_meteo_data(RawMeteoData)
         response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()        
         return response
 
-    def SendPollutionData(self,RawPollutionData, context):
-        processor_service.send_pollution_data(RawPollutionData)
+    def ProcessPollutionData(self,RawPollutionData, context):
+        processor_service.process_pollution_data(RawPollutionData)
         response = meteoServer_pb2.google_dot_protobuf_dot_empty__pb2.Empty()
         return response  
     
@@ -52,7 +54,7 @@ def main():
     meteoServer_pb2_grpc.add_LoadBalancerServiceServicer_to_server(LoadBalancerServiceServicer(), server)
     # listen on port 50051
     print('Starting server. Listening on port 50051.')
-    server.add_insecure_port('0.0.0.0:50051')
+    server.add_insecure_port('[::]:50051')
     server.start()
     #=====================================================================================================
 
