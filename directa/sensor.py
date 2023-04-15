@@ -6,11 +6,11 @@ import time
 import multiprocessing
 from google.protobuf.timestamp_pb2 import Timestamp
 
-# 5 de cada sensor 
 N_SENS = 2
 
-def meteo_function(sensor):
+def send_meteo_data(sensor, channel):
     detector = MeteoDataDetector()
+    stub = meteoServer_pb2_grpc.MeteoServiceStub(channel)
     while True:
         timestamp = Timestamp()
         timestamp.seconds = int(time.time())
@@ -21,8 +21,9 @@ def meteo_function(sensor):
         stub.SendMeteoData(RawMeteoData)
         time.sleep(2)
 
-def pollution_function(sensor):
+def send_pollution_data(sensor, channel):
     detector = MeteoDataDetector()
+    stub = meteoServer_pb2_grpc.MeteoServiceStub(channel)
     while True:
         timestamp = Timestamp()
         timestamp.seconds = int(time.time())
@@ -32,18 +33,26 @@ def pollution_function(sensor):
         stub.SendPollutionData(RawPollutionData)
         time.sleep(2)
     
-# open a gRPC channel
-with grpc.insecure_channel('localhost:50051') as channel:
-    
-    # create a stub (client)
-    stub = meteoServer_pb2_grpc.MeteoServiceStub(channel)
-       
+def main():
+    channels = []
     for i in range(N_SENS):
-        process_name = f"SensorAir{i}"
-        process = multiprocessing.Process(target=meteo_function, args=(process_name,))
-        process.start()
-    
+        channel = grpc.insecure_channel('localhost:50051')
+        channels.append(channel)
+        
+    processes = []
     for i in range(N_SENS):
-        process_name = f"SensorPol{i}"
-        process = multiprocessing.Process(target=pollution_function, args=(process_name,))
-        process.start()
+        process_name_air = f"SensorAir{i}"
+        process_air = multiprocessing.Process(target=send_meteo_data, args=(process_name_air, channels[i], ))
+        processes.append(process_air)
+        process_air.start()
+
+        process_name_pol = f"SensorPol{i}"
+        process_pol = multiprocessing.Process(target=send_pollution_data, args=(process_name_pol, channels[i], ))
+        processes.append(process_pol)
+        process_pol.start()
+
+    for process in processes:
+        process.join()
+
+if __name__ == "__main__":
+    main()
